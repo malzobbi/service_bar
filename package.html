@@ -1,0 +1,179 @@
+<style>
+ul.naving {
+    margin:0;
+    padding:0;
+    list-style:none;
+    height:36px; line-height:36px;
+    width: 550px;
+    background:#A3F59E; /* you can change the backgorund color here. */
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:13px;
+}
+ul.naving li {
+    border-right:1px solid #A3F59E; /* you can change the border color matching to your background color */
+    float:right;
+}
+ul.naving a {
+    display:block;
+    padding:0 28px;
+    color:#000;
+    text-decoration:none;
+}
+ul.naving a:hover,
+ul.naving li.current a {
+    background:#086754;
+     color:#fff;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+
+</style>
+
+<canvas id="singelBarChart">This is just a test...please add your canvas here</canvas>
+
+
+<div id="image1"></div>
+                                <hr>
+                                <?php print '<font size="2" color="#5F5F5F">This report was created on '.Date("d-M-Y")." at: ".Date("H:i"); ?>
+                                <ul class="naving">
+									  <li><a href="#" title="Print the graph" alt="Function" onclick="service('1','singelBarChart')">Print <i class="ti-printer"></i></a></li>
+									  <li><a href="#" title="Save as a pdf" alt="Function" onclick="service('4','singelBarChart')">File <i class="ti-file"></i></a></li>
+									  <li><a href="#" title="Send email to someone" alt="Function" onclick="service('3','singelBarChart')">Email <i class="ti-email"></i></a></li>
+									  <li><a href="#" title="Make screenshot" alt="Function" onclick="service('5','singelBarChart')">Screenshot  <i class="ti-camera"></i></a></li>
+									  <li><a href="#" title="Save the graph as an image" alt="Function" onclick="service('2','singelBarChart')">Save  <i class="ti-save"></i></a></li>
+								</ul>
+								
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>								
+								
+<script>
+
+///////////////////////////////////////////////package of service bar /////////////////////////////////////////////////////////////////////////////
+
+					function service(t,canv){
+					
+						var imgs=document.getElementById(canv);
+						src_url = imgs.toDataURL("image/png");
+						var rnd=Math.floor(Math.random() * 1000); 
+						var fileName=rnd+"_Graph.png";
+						var fileNamePDF=rnd+"_file.pdf";
+					
+					if(t=='1'){
+					//print
+						var URL="print_out.php?images="+src_url;
+						var wd=screen.width-400;
+						window.open(URL, "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=800,width="+wd+",height=600");
+					
+						
+					}
+					if(t=='2'){
+					//save
+					
+					save(fileName)
+					}
+					
+					if(t=='3'){
+					//send email
+							
+					 var URL="send_email.php?images="+src_url;
+					window.open(URL, "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=600,width=800,height=800");
+					
+					}	
+					
+					if(t=='4'){
+					//convert to pdf
+					//convert canvas to image
+					
+					
+					//view image in location
+					
+					
+					
+						document.getElementById("image1").innerHTML='<img border="0" style="display:none" width="750" height="500" src="'+src_url+'">'
+					
+					content="image1";
+					converToPDF(fileNamePDF,content)
+					
+					}
+					
+					if(t=='5'){
+					//screenshot
+					
+					document.getElementById("error").style.display="block"
+					document.getElementById("blacks").style.display="block"
+					
+					document.getElementById("message").innerHTML='<img border="0" src="'+src_url+'">'
+					document.getElementById("hdr").innerHTML='SERVICE OF SCREENSHOT <span class="closebtn" onclick="closing()">x</span>'
+					document.getElementById("btns").innerHTML='<input class="longBtn" type="button" value=" CLOSE " name="B4" onclick="closing()">';
+					
+					
+					
+					}
+					}
+					
+					function save(fileName) {
+					   $('#singelBarChart')[0].toBlob((blob) => {
+					        let URLObj = window.URL || window.webkitURL;
+					        let a = document.createElement("a");  
+					        a.href = URLObj.createObjectURL(blob);
+					        a.download = fileName;
+					        document.body.appendChild(a);
+					        a.click();
+					        document.body.removeChild(a);
+					   });
+					}
+					
+					
+					//PDF
+					function converToPDF(fileNamePDF,content) {
+					        var pdf = new jsPDF('p', 'pt', 'A3');
+					        // source can be HTML-formatted string, or a reference
+					        // to an actual DOM element from which the text will be scraped.
+					        source = $('#'+content)[0];
+					
+					        
+					        specialElementHandlers = {
+					            // element with id of "bypass" - jQuery style selector
+					            '#bypassme': function (element, renderer) {
+					                // true = "handled elsewhere, bypass text extraction"
+					                return true
+					            }
+					        };
+					        margins = {
+					            top: 80,
+					            bottom: 60,
+					            left: 40,
+					            width: 522
+					        };
+					        // all coords and widths are in jsPDF instance's declared units
+					        // 'inches' in this case
+					        pdf.fromHTML(
+					            source, // HTML string or DOM elem ref.
+					            margins.left, // x coord
+					            margins.top, { // y coord
+					                'width': margins.width, // max width of content on PDF
+					                'elementHandlers': specialElementHandlers
+					            },
+					
+					            function (dispose) {
+					                // dispose: object with X, Y of the last line add to the PDF 
+					                //          this allow the insertion of new lines after html
+					                pdf.save(fileNamePDF);
+					            }, margins
+					        );
+					}
+/////////////////////////////////////////////////////////////end of package of service/////////////////////////////////////////////////////					
+
+
+
+</script>
